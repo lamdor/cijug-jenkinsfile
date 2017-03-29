@@ -91,7 +91,7 @@ kubectl create ns jenkins
 namespace "jenkins" created
 #+end_example
 
-*** create jenkins admin password secrete
+*** create jenkins admin password secret
 #+BEGIN_SRC bash :results output
 PASSWORD=`openssl rand -base64 15`; echo "Your password is $PASSWORD"; sed -i.bak s#CHANGE_ME#$PASSWORD# jenkins/k8s/options
 #+END_SRC
@@ -202,8 +202,11 @@ Events:
 *** setup sbt tool
 ** Setup kubectl tool in Jenkins manager
 ** Setup Github 
-*** setup Github server with new personal access token reds
+*** setup Github server with new personal access token creds as username/password
 *** setup jenkins public url
+** add more plugins
+*** ansiColor
+*** slack
 * A history of Jenkins jobs
 ** Freestyle job
 ** Multijob
@@ -255,6 +258,7 @@ Plenty more at https://jenkins.io/doc/pipeline/steps/
 - =scm=
 - =currentBuild=
 - =ENV=
+- =params=
 
 ** Shared libraries
 

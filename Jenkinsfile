@@ -2,14 +2,15 @@
 
 stage("Test") {
   node {
-    def sbtHome = tool("sbt 0.13.13")
+    checkout scm
 
-    ansiColor {
-      try {
+    try {
+      def sbtHome = tool("sbt 0.13.13")
+      ansiColor {
         sh "${sbtHome}/bin/sbt test"
-      } finally {
-        junit(testResults: "target/test-reports/*.xml", allowEmptyResults: true)
       }
+    } finally {
+      junit(testResults: "target/test-reports/*.xml", allowEmptyResults: true)
     }
   }
 }
@@ -17,12 +18,15 @@ stage("Test") {
 
 if (env.BRANCH_NAME == "master") {
   stage("Release") {
-    node {
-      def sbtHome = tool("sbt 0.13.13")
+    checkout scm
 
+    try {
+      def sbtHome = tool("sbt 0.13.13")
       ansiColor {
         sh "${sbtHome}/bin/sbt release"
       }
+    } finally {
+      junit(testResults: "target/test-reports/*.xml", allowEmptyResults: true)
     }
   }
 }
