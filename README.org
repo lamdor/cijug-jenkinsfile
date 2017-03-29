@@ -336,6 +336,9 @@ deployment "devopsdsm-hello" created
 
 ** Code
 ** Concurrent pipelines
+
+- =lock=
+- =milestone=
 * Extras
 ** Blue Ocean
 ** Blue Green Deployments

@@ -1,7 +1,5 @@
 #!/usr/bin/env groovy
 
-releasedVersion = ""
-
 stage("Test") {
   node {
     checkout scm
@@ -17,6 +15,8 @@ stage("Test") {
   }
 }
 
+
+releasedVersion = ""
 
 if (env.BRANCH_NAME == "completed") {
   stage("Release") {
@@ -54,7 +54,7 @@ if (env.BRANCH_NAME == "completed") {
     }
   }
 
-  input 'Deploy to production?'
+  input 'Deploy ${releasedVersion} to production?'
 
   stage("Production deploy") {
     node {
@@ -62,7 +62,7 @@ if (env.BRANCH_NAME == "completed") {
       sh "git checkout v${releasedVersion}"
 
       def kubctlHome = tool("kubectl")
-      sh "kubectl apply -f k8s/ --namespace staging"
+      sh "kubectl apply -f k8s/ --namespace production"
     }
   }
 }
