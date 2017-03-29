@@ -16,7 +16,7 @@ stage("Test") {
 }
 
 
-if (env.BRANCH_NAME == "master") {
+if (env.BRANCH_NAME == "completed") {
   stage("Release") {
     checkout scm
 
