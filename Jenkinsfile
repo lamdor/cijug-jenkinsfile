@@ -18,15 +18,13 @@ stage("Test") {
 
 if (env.BRANCH_NAME == "completed") {
   stage("Release") {
-    checkout scm
+    node {
+      checkout scm
 
-    try {
       def sbtHome = tool("sbt 0.13.13")
       ansiColor {
         sh "${sbtHome}/bin/sbt \"release with-defaults\""
       }
-    } finally {
-      junit(testResults: "target/test-reports/*.xml", allowEmptyResults: true)
     }
   }
 }
