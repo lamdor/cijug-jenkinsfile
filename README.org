@@ -98,7 +98,7 @@ PASSWORD=`openssl rand -base64 15`; echo "Your password is $PASSWORD"; sed -i.ba
 
 #+RESULTS:
 #+begin_example
-Your password is yyApPfsHSLUTArdElPB6
+Your password is 
 #+end_example
 
 #+BEGIN_SRC bash :results output
@@ -235,7 +235,14 @@ namespace "production" created
 ** Freestyle job
 ** Multijob
 ** Pipeline
+** So how did I get here?
 * Jenkinsfile
+** 
+#+BEGIN_QUOTE
+Jenkins Pipeline is a suite of plugins which supports implementing and integrating continuous delivery pipelines into Jenkins. Pipeline provides an extensible set of tools for modeling simple-to-complex delivery pipelines "as code" via the Pipeline DSL.
+
+Typically, this "Pipeline as Code" would be written to a =Jenkinsfile= and checked into a project’s source control repository,
+#+END_QUOTE
 ** Simple commands
 
 - =echo=
@@ -253,9 +260,9 @@ With a catch... It all has to be serializable.
 
 ** Since just groovy
 
-- =try { ... } catch { ... }=
+- =try { ... } catch { ... } finally { ... }=
 - =if { ... } else { ... }=
-- =def= 
+- =def blah()= 
 - ="hello ${name}"=
 
 ** More commands
@@ -296,20 +303,14 @@ Can setup a repository to share groovy code between jobs
 *NEW*
 
 adds =pipeline= to your Jenkinsfile
-* Github multibranch support
-Jenkins automatically discovers branches and pull requests.
-Creates jobs for each!
-** create a a job for our devopsdsm-jenkinsfile repo
-*** need to disable cert verification in the github settings!
-* Continuous Deployment
-** The app
+* The App
 - simple scala app
 - just outputs the current version of app
+** Deployment
 - running this in kubernetes
 - two different namespaces
   - staging
   - production
-*** run a release
 *** deploy k8s resources to staging ns
 #+BEGIN_SRC bash :results output
 kubectl apply -f k8s/ --namespace staging
@@ -321,26 +322,58 @@ service "devopsdsm-hello" created
 deployment "devopsdsm-hello" created
 #+end_example
 
-** The plan
-** Pull requests
-
-- Just run tests.
-
-** On master
-
+** Release
+- update version files
+- update k8s deployment image to version
+- git tag
+- build image
+- push
+* Github Multibranch
+Jenkins automatically discovers branches and pull requests.
+Creates jobs for each!
+** 
+**But I have all these pull requests!**
+** create a a job for our devopsdsm-jenkinsfile repo
+- need to disable cert verification in the github settings!
+* Continuous Deployment
+** The pipeline
 - Run tests
 - Release (build image and tag)
 - Deploy to staging automatically
 - Ask if we want to deploy to prod
 - Deploy to production
-
 ** Code
 ** Concurrent pipelines
 
 - =lock=
 - =milestone=
 * Extras
+** Tips and tricks
+*** 
+#+BEGIN_SRC groovy
+currentBuild.displayName = releasedVersion
+#+END_SRC
+*** 
+#+BEGIN_SRC groovy
+timeout(time: 7, unit: "days") {
+  slackSend("Hey, authorize the deployment!")
+  milestone()
+  input("Promote to UAT?")
+}
+#+END_SRC
+*** use groovy closures
+#+BEGIN_SRC groovy
+def preparedTerraformNode(Closure body) {
+  node("agent") {
+    sh "go get ..."
+    sh "go get ..."
+    sh "go get ..."
+    body()
+  }
+}
+#+END_SRC
 ** Blue Ocean
 ** Blue Green Deployments
-** Smokes
+** Smoke testing
+** Canary
 * Cleanup
