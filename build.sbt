@@ -54,6 +54,7 @@ releaseProcess := Seq[ReleaseStep](
   releaseStepTask(updateK8sImageInDeploymentYaml),
   releaseStepTask(gitCommitK8sDeploymentYaml),
   tagRelease,
+  releaseStepTask(releasePushTags),
   releaseStepTask(sbtdocker.DockerKeys.dockerBuildAndPush)
 )
 
@@ -76,3 +77,7 @@ gitCommitK8sDeploymentYaml := {
     (git.commit(s"Update k8s deployment image to ${version.value}", false) !)
   }
 }
+
+val releasePushTags = taskKey[Unit]("push tags")
+releasePushTags :=
+  releaseVcs.value.map { git => (git.cmd("push", "--tags", "origin") !) }
