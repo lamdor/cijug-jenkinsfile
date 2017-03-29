@@ -223,39 +223,43 @@ Events:
 With a catch... It all has to be serializable.
 
 - Since jenkins can pause the pipeline
+
 ** Since just groovy
 
-- try / catch works
-- if / else works
-- string interpolation
-- =def= works 
+- =try { ... } catch { ... }=
+- =if { ... } else { ... }=
+- =def= 
+- ="hello ${name}"=
 
 ** More commands
 
-- git
-- timeout
-- tool
-- readFile
-- writeFile
-- catchError
-- waitUntil
-- retry
+- =git= / =svn= / =cvs=
+- =timeout=
+- =tool=
+- =readFile=
+- =writeFile=
+- =catchError=
+- =waitUntil=
+- =retry=
 
 ** Commands added by plugins
 
 Plenty more at https://jenkins.io/doc/pipeline/steps/
 
-- slackSend
-- ansiColor
-- junit
+- =slackSend=
+- =ansiColor=
+- =junit=
 
 ** Variables in scope
 
-- scm
-- currentBuild
-- ENV
+- =scm=
+- =currentBuild=
+- =ENV=
+
 ** Shared libraries
+
 Can setup a repository to share groovy code between jobs
+
 ** Can be checked in to SCM
 
 *Pipeline as code!*
