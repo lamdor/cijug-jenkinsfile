@@ -54,7 +54,7 @@ if (env.BRANCH_NAME == "completed") {
     }
   }
 
-  input 'Deploy ${releasedVersion} to production?'
+  input "Deploy ${releasedVersion} to production?"
 
   stage("Production deploy") {
     node {
