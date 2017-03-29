@@ -206,8 +206,9 @@ Events:
 *** setup jenkins public url
 *** make sure that it can manage hooks
 ** add more plugins
-*** ansiColor
-*** slack
+- ansi color
+- slack
+- custom tools
 ** add docker registry secret
 
 #+BEGIN_SRC bash :results output

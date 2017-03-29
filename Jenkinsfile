@@ -23,6 +23,10 @@ if (env.BRANCH_NAME == "completed") {
 
       def sbtHome = tool("sbt 0.13.13")
       ansiColor {
+        sh '''
+        git config --global user.email "jenkins@rubbish.io"
+        git config --global user.name "Jenkins"
+'''
         sh "${sbtHome}/bin/sbt \"release with-defaults\""
       }
     }
