@@ -204,9 +204,22 @@ Events:
 ** Setup Github 
 *** setup Github server with new personal access token creds as username/password
 *** setup jenkins public url
+*** make sure that it can manage hooks
 ** add more plugins
 *** ansiColor
 *** slack
+** add env namespaces
+#+BEGIN_SRC bash :results output
+kubectl create ns staging
+kubectl create ns production
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+namespace "staging" created
+namespace "production" created
+#+end_example
+
 * A history of Jenkins jobs
 ** Freestyle job
 ** Multijob
@@ -275,6 +288,8 @@ adds =pipeline= to your Jenkinsfile
 * Github multibranch support
 Jenkins automatically discovers branches and pull requests.
 Creates jobs for each!
+** create a a job for our devopsdsm-jenkinsfile repo
+*** need to disable cert verification in the github settings!
 * Continuous Deployment
 ** The app
 - simple scala app
