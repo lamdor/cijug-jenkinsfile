@@ -320,4 +320,6 @@ kubectl apply -f k8s/ --namespace staging
 ** Concurrent pipelines
 * Extras
 ** Blue Ocean
+** Blue Green Deployments
+** Smokes
 * Cleanup
