@@ -21,11 +21,18 @@ stage("Test") {
 if (env.BRANCH_NAME == "completed") {
   stage("Release") {
     node {
+      withCredentials([file(credentialsId: 'github-id-rsa', variable: 'id_rsa')]) {
+
         sh '''
-        git config --global user.email "jenkins@rubbish.io"
-        git config --global user.name "Jenkins"
-        git config --global credential.helper cache
-'''
+          git config --global user.email "jenkins@rubbish.io"
+          git config --global user.name "Jenkins"
+          mkdir -p ~/.ssh
+          mv ${id_rsa} ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          git config --global url."git@github.com:rubbish".insteadOf https://github.com/rubbish
+        '''
+      }
+
       checkout scm
 
       def sbtHome = tool("sbt 0.13.13")
