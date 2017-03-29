@@ -30,14 +30,27 @@ imageNames in docker := Seq(
 )
 
 // release process
+// set next release version
+import sbtrelease._
 import ReleaseTransformations._
+
+releaseVersion := { _ =>
+  val lastGitTagVersion = {
+    for {
+      git   <- releaseVcs.value
+      allTags = git.cmd("tag", "-l").lines.toList
+      lastTag <- allTags.flatMap { str =>
+        Version.apply(str.replaceAll("^v", ""))
+      }.sortBy(v => (- v.major, - v.subversions.head)).headOption
+    } yield lastTag
+  }
+  lastGitTagVersion.map(_.bumpMinor.toString).getOrElse("0.1")
+}
+
 releaseProcess := Seq[ReleaseStep](
-  inquireVersions,                        // : ReleaseStep
-  setReleaseVersion,                      // : ReleaseStep
-  commitReleaseVersion,                   // : ReleaseStep, performs the initial git checks
-  tagRelease,                             // : ReleaseStep
-  releaseStepTask(sbtdocker.DockerKeys.dockerBuildAndPush), // : ReleaseStep
-  setNextVersion,                         // : ReleaseStep
-  commitNextVersion,                      // : ReleaseStep
-  pushChanges                             // : ReleaseStep, also checks that an upstream branch is properly configured
+  setReleaseVersion,
+  // update deployment yaml to version
+  commitReleaseVersion.copy(check = identity),
+  tagRelease,
+  releaseStepTask(sbtdocker.DockerKeys.dockerBuildAndPush)
 )

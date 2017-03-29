@@ -298,6 +298,11 @@ Creates jobs for each!
 - two different namespaces
   - staging
   - production
+*** run a release
+*** deploy k8s resources to staging ns
+#+BEGIN_SRC bash :results output
+kubectl apply -f k8s/ --namespace staging
+#+END_SRC
 ** The plan
 ** Pull requests
 

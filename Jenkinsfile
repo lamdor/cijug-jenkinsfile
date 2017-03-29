@@ -23,7 +23,7 @@ if (env.BRANCH_NAME == "master") {
     try {
       def sbtHome = tool("sbt 0.13.13")
       ansiColor {
-        sh "${sbtHome}/bin/sbt release"
+        sh "${sbtHome}/bin/sbt \"release with-defaults\""
       }
     } finally {
       junit(testResults: "target/test-reports/*.xml", allowEmptyResults: true)

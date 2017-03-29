@@ -1,0 +1,24 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: devopsdsm-hello
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: devopsdsm-hello
+    spec:
+      containers:
+      - name: app
+        image: rubbish/devopsdsm-hello:0.1
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 2
+          failureThreshold: 5
