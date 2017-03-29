@@ -48,6 +48,7 @@ releaseVersion := { _ =>
 }
 
 releaseProcess := Seq[ReleaseStep](
+  inquireVersions,
   setReleaseVersion,
   // update deployment yaml to version
   commitReleaseVersion.copy(check = identity),
