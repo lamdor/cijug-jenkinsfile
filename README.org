@@ -303,6 +303,13 @@ Creates jobs for each!
 #+BEGIN_SRC bash :results output
 kubectl apply -f k8s/ --namespace staging
 #+END_SRC
+
+#+RESULTS:
+#+begin_example
+service "devopsdsm-hello" created
+deployment "devopsdsm-hello" created
+#+end_example
+
 ** The plan
 ** Pull requests
 

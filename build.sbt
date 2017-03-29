@@ -50,8 +50,29 @@ releaseVersion := { _ =>
 releaseProcess := Seq[ReleaseStep](
   inquireVersions,
   setReleaseVersion,
-  // update deployment yaml to version
   commitReleaseVersion.copy(check = identity),
+  releaseStepTask(updateK8sImageInDeploymentYaml),
+  releaseStepTask(gitCommitK8sDeploymentYaml),
   tagRelease,
   releaseStepTask(sbtdocker.DockerKeys.dockerBuildAndPush)
 )
+
+
+val k8sDeploymentYamlFile = settingKey[File]("k8s deployment file")
+k8sDeploymentYamlFile := baseDirectory.value / "k8s/devopsdsm-hello.yaml"
+
+val updateK8sImageInDeploymentYaml = taskKey[Unit]("Updates the k8s/devopsdsm-hello.yaml deployment image")
+updateK8sImageInDeploymentYaml := {
+  val yamlLines = IO.readLines(k8sDeploymentYamlFile.value)
+  val imageRegex = s"image: rubbish/${name.value}.+"
+  val updatedLines = yamlLines.map(_.replaceAll(imageRegex, s"image: rubbish/${name.value}:${version.value}"))
+  IO.writeLines(k8sDeploymentYamlFile.value, updatedLines)
+}
+
+val gitCommitK8sDeploymentYaml = taskKey[Unit]("Commits k8s/devopsdsm-hello.yaml changes")
+gitCommitK8sDeploymentYaml := {
+  releaseVcs.value.map { git =>
+    (git.add(k8sDeploymentYamlFile.value.getPath) !)
+    (git.commit(s"Update k8s deployment image to ${version.value}", false) !)
+  }
+}
