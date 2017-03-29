@@ -208,6 +208,17 @@ Events:
 ** add more plugins
 *** ansiColor
 *** slack
+** add docker registry secret
+
+#+BEGIN_SRC bash :results output
+kubectl create secret generic docker-config-json --namespace=jenkins --from-file=$HOME/.docker/config.json
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+secret "docker-config-json" created
+#+end_example
+*** add to jenkins pod template as secret volume
 ** add env namespaces
 #+BEGIN_SRC bash :results output
 kubectl create ns staging
@@ -219,7 +230,6 @@ kubectl create ns production
 namespace "staging" created
 namespace "production" created
 #+end_example
-
 * A history of Jenkins jobs
 ** Freestyle job
 ** Multijob

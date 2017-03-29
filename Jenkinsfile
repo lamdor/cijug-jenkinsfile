@@ -21,9 +21,12 @@ if (env.BRANCH_NAME == "completed") {
     node {
       checkout scm
 
-      def sbtHome = tool("sbt 0.13.13")
-      ansiColor {
-        sh "${sbtHome}/bin/sbt \"release with-defaults\""
+      withEnv(["GIT_AUTHOR_NAME=jenkins",
+               "GIT_AUTHOR_EMAIL=jenkins@rubbish.io"]) {
+        def sbtHome = tool("sbt 0.13.13")
+        ansiColor {
+          sh "${sbtHome}/bin/sbt \"release with-defaults\""
+        }
       }
     }
   }
