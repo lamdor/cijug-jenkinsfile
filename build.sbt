@@ -44,7 +44,7 @@ releaseVersion := { _ =>
       }.sortBy(v => (- v.major, - v.subversions.head)).headOption
     } yield lastTag
   }
-  lastGitTagVersion.map(_.bumpMinor.toString).getOrElse("0.1")
+  lastGitTagVersion.map(_.bumpMinor.string).getOrElse("0.1")
 }
 
 releaseProcess := Seq[ReleaseStep](
