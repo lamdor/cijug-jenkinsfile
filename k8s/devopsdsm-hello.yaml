@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
       - name: app
-        image: rubbish/devopsdsm-hello:1-SNAPSHOT
+        image: rubbish/devopsdsm-hello:0.10
         ports:
         - containerPort: 8080
         readinessProbe:
