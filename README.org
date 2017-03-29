@@ -219,6 +219,7 @@ kubectl create secret generic docker-config-json --namespace=jenkins --from-file
 secret "docker-config-json" created
 #+end_example
 *** add to jenkins pod template as secret volume
+** add git env var to pod template
 ** add env namespaces
 #+BEGIN_SRC bash :results output
 kubectl create ns staging
