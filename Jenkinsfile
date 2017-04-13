@@ -3,7 +3,7 @@ stage("Test") {
     checkout scm
 
     try {
-      def sbtHome = tool("sbt 0.13.13")
+      def sbtHome = tool("sbt 0.13.15")
       ansiColor {
         sh "${sbtHome}/bin/sbt test"
       }
