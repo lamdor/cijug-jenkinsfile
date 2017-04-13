@@ -8,7 +8,7 @@ object Hello extends ServerApp {
 
   val sayHello = HttpService {
     case req =>
-      Ok(s"Hello from version ${BuildInfo.version}")
+      Ok(s"Hello CIJUG from version ${BuildInfo.version}")
   }
 
   override def server(args: List[String]) = {
