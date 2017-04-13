@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
       - name: app
-        image: rubbish/cijug-hello:0.13
+        image: rubbish/cijug-hello:0.15
         ports:
         - containerPort: 8080
         readinessProbe:
