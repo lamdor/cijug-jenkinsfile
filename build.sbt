@@ -1,5 +1,5 @@
 organization := "io.rubbish"
-name := "devopsdsm-hello"
+name := "cijug-hello"
 
 scalaVersion in ThisBuild := "2.11.8"
 scalaOrganization in ThisBuild := "org.typelevel"
@@ -60,9 +60,9 @@ releaseProcess := Seq[ReleaseStep](
 
 
 val k8sDeploymentYamlFile = settingKey[File]("k8s deployment file")
-k8sDeploymentYamlFile := baseDirectory.value / "k8s/devopsdsm-hello.yaml"
+k8sDeploymentYamlFile := baseDirectory.value / "k8s/cijug-hello.yaml"
 
-val updateK8sImageInDeploymentYaml = taskKey[Unit]("Updates the k8s/devopsdsm-hello.yaml deployment image")
+val updateK8sImageInDeploymentYaml = taskKey[Unit]("Updates the k8s/cijug-hello.yaml deployment image")
 updateK8sImageInDeploymentYaml := {
   val yamlLines = IO.readLines(k8sDeploymentYamlFile.value)
   val imageRegex = s"image: rubbish/${name.value}.+"
@@ -70,7 +70,7 @@ updateK8sImageInDeploymentYaml := {
   IO.writeLines(k8sDeploymentYamlFile.value, updatedLines)
 }
 
-val gitCommitK8sDeploymentYaml = taskKey[Unit]("Commits k8s/devopsdsm-hello.yaml changes")
+val gitCommitK8sDeploymentYaml = taskKey[Unit]("Commits k8s/cijug-hello.yaml changes")
 gitCommitK8sDeploymentYaml := {
   releaseVcs.value.map { git =>
     (git.add(k8sDeploymentYamlFile.value.getPath) !)

@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: devopsdsm-hello
+  name: cijug-hello
 spec:
   type: LoadBalancer
   selector:
-    app: devopsdsm-hello
+    app: cijug-hello
   ports:
     - protocol: TCP
       port: 80

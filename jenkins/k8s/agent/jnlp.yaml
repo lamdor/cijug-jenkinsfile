@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    jenkins: slave
+  name: jnlp-persistent
+  namespace: jenkins
+spec:
+  containers:
+  - args:
+    - 30f065694079380297d2704d6e019f80984c11aafbb7d2ca0f68f28d4e28603a
+    - jnlp-persistent
+    env:
+    - name: JENKINS_SECRET
+      value: 30f065694079380297d2704d6e019f80984c11aafbb7d2ca0f68f28d4e28603a
+    - name: JENKINS_NAME
+      value: jnlp-persistent
+    - name: JENKINS_URL
+      value: http://jenkins-ui.jenkins.svc.cluster.local:8080
+    - name: JENKINS_TUNNEL
+      value: jenkins-discovery.jenkins.svc.cluster.local:50000
+    - name: JENKINS_JNLP_URL
+      value: http://jenkins-ui.jenkins.svc.cluster.local:8080/computer/jnlp-persistent/slave-agent.jnlp
+    - name: GIT_AUTHOR_NAME
+      value: jenkins
+    - name: GIT_AUTHOR_EMAIL
+      value: jenkins@rubbish.io
+    - name: HOME
+      value: /root/
+    image: gcr.io/cloud-solutions-images/jenkins-k8s-slave
+    imagePullPolicy: IfNotPresent
+    name: jnlp
+    resources: {}
+    securityContext:
+      privileged: false
+    terminationMessagePath: /dev/termination-log
+    volumeMounts:
+    - mountPath: /root/.docker
+      name: volume-2
+    - mountPath: /var/run/docker.sock
+      name: volume-1
+    - mountPath: /usr/bin/docker
+      name: volume-0
+    - mountPath: /root/
+      name: workspace-volume
+    workingDir: /root/
+  volumes:
+  - hostPath:
+      path: /usr/bin/docker
+    name: volume-0
+  - hostPath:
+      path: /var/run/docker.sock
+    name: volume-1
+  - name: volume-2
+    secret:
+      defaultMode: 420
+      secretName: docker-config-json
+  - emptyDir: {}
+    name: workspace-volume

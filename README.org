@@ -9,48 +9,49 @@
 #+REVEAL_ROOT: file:////Users/luke/code/presentations/reveal.js
 
 * Prerequisites
-** Start up a GKE cluster
 Pretty much following https://cloud.google.com/solutions/jenkins-on-container-engine-tutorial
-*** Create the project under https://console.cloud.google.com and ensure it has Compute Engine support by going to it in the console.
 
-I created rubbish-devopsdsm
+** Start up a GKE cluster
+*** Create the project
 
 #+BEGIN_SRC bash :results output
-gcloud config set project rubbish-devopsdsm
+gcloud projects create rubbish-cijug --set-as-default
 #+END_SRC
+
+and have to go to https://console.cloud.google.com/compute/instances?project=rubbish-cijug to enable billing for the new project and start compute engine
 
 #+RESULTS:
 
-*** Create the GLK cluster
+*** Create the GKE cluster
 #+BEGIN_SRC bash :results output
-gcloud compute networks create rubbish-devopsdsm --mode auto
+gcloud compute networks create rubbish-cijug --mode auto
 
-gcloud container clusters create rubbish-devopsdsm \
-  --network rubbish-devopsdsm \
+gcloud container clusters create rubbish-cijug \
+  --network rubbish-cijug \
   --scopes "https://www.googleapis.com/auth/projecthosting,storage-rw"
 #+END_SRC
 
 #+RESULTS:
 #+begin_example
-NAME               MODE  IPV4_RANGE  GATEWAY_IPV4
-rubbish-devopsdsm  auto
-NAME               ZONE           MASTER_VERSION  MASTER_IP       MACHINE_TYPE   NODE_VERSION  NUM_NODES  STATUS
-rubbish-devopsdsm  us-central1-a  1.5.4           104.197.189.91  n1-standard-1  1.5.4         3          RUNNING
+NAME           MODE  IPV4_RANGE  GATEWAY_IPV4
+rubbish-cijug  auto
+NAME           ZONE           MASTER_VERSION  MASTER_IP      MACHINE_TYPE   NODE_VERSION  NUM_NODES  STATUS
+rubbish-cijug  us-central1-a  1.5.6           104.154.52.49  n1-standard-1  1.5.6         3          RUNNING
 #+end_example
 
-#+BEGIN_SRC bash :results output
+#+BEGIN_SRC bash :results output :async
 gcloud container clusters list
 #+END_SRC
 
 #+RESULTS:
 #+begin_example
-NAME               ZONE           MASTER_VERSION  MASTER_IP       MACHINE_TYPE   NODE_VERSION  NUM_NODES  STATUS
-rubbish-devopsdsm  us-central1-a  1.5.4           104.197.189.91  n1-standard-1  1.5.4         3          RUNNING
+NAME           ZONE           MASTER_VERSION  MASTER_IP      MACHINE_TYPE   NODE_VERSION  NUM_NODES  STATUS
+rubbish-cijug  us-central1-a  1.5.6           104.154.52.49  n1-standard-1  1.5.6         3          RUNNING
 #+end_example
 
 *** Get kubectl credentials 
 #+BEGIN_SRC bash :results output
-gcloud container clusters get-credentials rubbish-devopsdsm
+gcloud container clusters get-credentials rubbish-cijug
 #+END_SRC
 
 #+RESULTS:
@@ -61,16 +62,26 @@ kubectl cluster-info
 
 #+RESULTS:
 #+begin_example
-Kubernetes master is running at https://104.197.189.91
-GLBCDefaultBackend is running at https://104.197.189.91/api/v1/proxy/namespaces/kube-system/services/default-http-backend
-Heapster is running at https://104.197.189.91/api/v1/proxy/namespaces/kube-system/services/heapster
-KubeDNS is running at https://104.197.189.91/api/v1/proxy/namespaces/kube-system/services/kube-dns
-kubernetes-dashboard is running at https://104.197.189.91/api/v1/proxy/namespaces/kube-system/services/kubernetes-dashboard
+Kubernetes master is running at https://104.154.52.49
+GLBCDefaultBackend is running at https://104.154.52.49/api/v1/proxy/namespaces/kube-system/services/default-http-backend
+Heapster is running at https://104.154.52.49/api/v1/proxy/namespaces/kube-system/services/heapster
+KubeDNS is running at https://104.154.52.49/api/v1/proxy/namespaces/kube-system/services/kube-dns
+kubernetes-dashboard is running at https://104.154.52.49/api/v1/proxy/namespaces/kube-system/services/kubernetes-dashboard
 
 To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
 #+end_example
 *** Create the jenkins disk
-#+BEGIN_SRC bash :results output
+#+BEGIN_SRC bash :results output :async
+gcloud compute images create jenkins-home-image --source-uri https://storage.googleapis.com/solutions-public-assets/jenkins-cd/jenkins-home-v3.tar.gz
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+NAME                PROJECT        FAMILY  DEPRECATED  STATUS
+jenkins-home-image  rubbish-cijug                      READY
+#+end_example
+
+#+BEGIN_SRC bash :results output :async
 gcloud compute disks create jenkins-home --image jenkins-home-image --zone us-central1-a
 #+END_SRC
 
@@ -98,7 +109,7 @@ PASSWORD=`openssl rand -base64 15`; echo "Your password is $PASSWORD"; sed -i.ba
 
 #+RESULTS:
 #+begin_example
-Your password is 
+Your password is awR2X5II+jegKWDMZ5kC
 #+end_example
 
 #+BEGIN_SRC bash :results output
@@ -116,7 +127,9 @@ kubectl apply -f jenkins/k8s/
 
 #+RESULTS:
 #+begin_example
-deployment "jenkins" created
+deployment "jenkins" configured
+service "jenkins-ui" configured
+service "jenkins-discovery" configured
 #+end_example
 
 #+BEGIN_SRC bash :results output
@@ -125,8 +138,8 @@ kubectl get pods --namespace jenkins
 
 #+RESULTS:
 #+begin_example
-NAME                      READY     STATUS    RESTARTS   AGE
-jenkins-167554897-g56nz   0/1       Running   0          1m
+NAME                       READY     STATUS    RESTARTS   AGE
+jenkins-3925258115-xkmdp   0/1       Running   0          1m
 #+end_example
 
 #+BEGIN_SRC bash :results output
@@ -136,8 +149,8 @@ kubectl get services --namespace jenkins
 #+RESULTS:
 #+begin_example
 NAME                CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
-jenkins-discovery   10.115.240.204   <none>        50000/TCP        7m
-jenkins-ui          10.115.247.196   <nodes>       8080:30778/TCP   7m
+jenkins-discovery   10.115.252.180   <none>        50000/TCP        2m
+jenkins-ui          10.115.251.100   <nodes>       8080:31465/TCP   2m
 #+end_example
 
 *** setup load balancer
@@ -165,7 +178,7 @@ kubectl apply -f jenkins/k8s/lb/ingress.yaml
 ingress "jenkins" created
 #+end_example
 
-#+BEGIN_SRC bash :results output
+#+BEGIN_SRC bash :results output :async
 kubectl describe ingress jenkins --namespace jenkins
 #+END_SRC
 
@@ -173,7 +186,7 @@ kubectl describe ingress jenkins --namespace jenkins
 #+begin_example
 Name:			jenkins
 Namespace:		jenkins
-Address:		35.186.255.64
+Address:		35.190.3.108
 Default backend:	jenkins-ui:8080 (10.112.2.3:8080)
 TLS:
   tls terminates 
@@ -182,33 +195,32 @@ Rules:
   ----	----	--------
   *	* 	jenkins-ui:8080 (10.112.2.3:8080)
 Annotations:
-  backends:			{"k8s-be-30778--908bd6c85825ceeb":"Unknown"}
-  forwarding-rule:		k8s-fw-jenkins-jenkins--908bd6c85825ceeb
-  https-forwarding-rule:	k8s-fws-jenkins-jenkins--908bd6c85825ceeb
-  https-target-proxy:		k8s-tps-jenkins-jenkins--908bd6c85825ceeb
-  static-ip:			k8s-fw-jenkins-jenkins--908bd6c85825ceeb
-  target-proxy:			k8s-tp-jenkins-jenkins--908bd6c85825ceeb
-  url-map:			k8s-um-jenkins-jenkins--908bd6c85825ceeb
+  https-forwarding-rule:	k8s-fws-jenkins-jenkins--f00799e17716018c
+  https-target-proxy:		k8s-tps-jenkins-jenkins--f00799e17716018c
+  target-proxy:			k8s-tp-jenkins-jenkins--f00799e17716018c
+  url-map:			k8s-um-jenkins-jenkins--f00799e17716018c
+  backends:			{"k8s-be-31465--f00799e17716018c":"HEALTHY"}
+  forwarding-rule:		k8s-fw-jenkins-jenkins--f00799e17716018c
+  ssl-cert:			k8s-ssl-jenkins-jenkins--f00799e17716018c
+  static-ip:			k8s-fw-jenkins-jenkins--f00799e17716018c
 Events:
-  FirstSeen	LastSeen	Count	From				SubObjectPath	Type		Reason	Message
-  ---------	--------	-----	----				-------------	--------	------	-------
-  4m		4m		1	{loadbalancer-controller }			Normal		ADD	jenkins/jenkins
-  2m		2m		1	{loadbalancer-controller }			Normal		CREATE	ip: 35.186.255.64
-  3m		2m		3	{loadbalancer-controller }			Normal		Service	default backend set to jenkins-ui:30778
+  FirstSeen	LastSeen	Count	From			SubObjectPath	Type		Reason	Message
+  ---------	--------	-----	----			-------------	--------	------	-------
+  3m		3m		1	loadbalancer-controller			Normal		ADD	jenkins/jenkins
+  1m		1m		1	loadbalancer-controller			Normal		CREATE	ip: 35.190.3.108
+  1m		8s		5	loadbalancer-controller			Normal		Service	default backend set to jenkins-ui:31465
 #+end_example
-** Update plugins in plugin manager
-** Setup sbt
-*** install sbt plugin
-*** setup sbt tool
 ** Setup kubectl tool in Jenkins manager
-** Setup Github 
-*** setup Github server with new personal access token creds as username/password
-*** setup jenkins public url
-*** make sure that it can manage hooks
-** add more plugins
+** Plugins
+*** Update plugins in plugin manager
+*** add more plugins
 - ansi color
 - slack
 - custom tools
+- blue ocean
+*** Setup sbt
+**** install sbt plugin
+**** setup sbt tool
 ** add docker registry secret
 
 #+BEGIN_SRC bash :results output
@@ -231,6 +243,36 @@ kubectl create ns production
 namespace "staging" created
 namespace "production" created
 #+end_example
+** Setup Github 
+*** setup Github server with new personal access token creds as username/password
+*** setup jenkins public url
+*** make sure that it can manage hooks
+*** setup github-id-rsa cred file with ssh private key
+** setup an agent in jenkins
+*** in jenkins ui, setup jnlp-persistent agent
+*** run in jenkins
+
+#+BEGIN_SRC bash :results output :async
+kubectl apply -f jenkins/k8s/agent/jnlp.yaml
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+pod "jnlp-persistent" created
+#+end_example
+
+
+#+BEGIN_SRC bash :results output :async
+kubectl get pods --namespace=jenkins
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+NAME                       READY     STATUS              RESTARTS   AGE
+jenkins-3925258115-xkmdp   1/1       Running             0          21m
+jnlp-persistent            0/1       ContainerCreating   0          3s
+#+end_example
+
 * A history of Jenkins jobs
 ** Freestyle job
 ** Multijob
@@ -284,6 +326,8 @@ Plenty more at https://jenkins.io/doc/pipeline/steps/
 - =ansiColor=
 - =junit=
 
+*** can always be checked out via Pipeline Reference in a job
+
 ** Variables in scope
 
 - =scm=
@@ -318,8 +362,8 @@ kubectl apply -f k8s/ --namespace staging
 
 #+RESULTS:
 #+begin_example
-service "devopsdsm-hello" created
-deployment "devopsdsm-hello" created
+service "cijug-hello" created
+deployment "cijug-hello" created
 #+end_example
 
 ** Release
@@ -333,7 +377,7 @@ Jenkins automatically discovers branches and pull requests.
 Creates jobs for each!
 ** 
 **But I have all these pull requests!**
-** create a a job for our devopsdsm-jenkinsfile repo
+** create a a job for our cijug-jenkinsfile repo
 - need to disable cert verification in the github settings!
 * Continuous Deployment
 ** The pipeline
