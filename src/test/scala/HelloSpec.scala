@@ -9,6 +9,6 @@ class HelloSpec extends FlatSpec {
     val getRoot = Request(Method.GET, uri("/"))
     val Some(resp) = Hello.sayHello.run(getRoot).unsafeRun.toOption
     val body = resp.as[String].unsafeRun
-    assert(body == s"Hello from version ${BuildInfo.version}")
+    assert(body == s"Hello CIJUG from version ${BuildInfo.version}")
   }
 }
